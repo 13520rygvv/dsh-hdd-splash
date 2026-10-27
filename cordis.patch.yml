@@ -1,0 +1,4 @@
+# 把本包装进 harness：一行 insert，id 与下面 index.js 的 name 对应。
+- insert:
+    - id: dsh-hdd-splash
+      name: '@local/dsh-hdd-splash'

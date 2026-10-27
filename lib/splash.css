@@ -1,0 +1,303 @@
+/* ============================================================================
+ * dsh-hdd-splash / splash.css
+ *
+ * 一、覆盖层：全屏 fixed，z-index 顶格，盖住整个 harness；播完整体移除。
+ *     覆盖层最底下一层是纯黑 bed（`#000`，只在开播前挡真实界面用，随后跟光晕
+ *     一起退），再往上是视频 → 光晕图 → 徽记。
+ * 二、徽记（fairy）：以下 `[data-hdd-mascot*]` 规则与 `hdd-mascot-*` keyframes
+ *     全部照抄 fairy-mascot-standalone/fairy-mascot.css（原样未改），只把选择器
+ *     收进 `.hdd-mascot-host` 作用域，避免污染宿主界面。唯一补的是
+ *     `[data-hdd-mascot-stage]::before` 缺的 content/position/inset —— 少了它们
+ *     那个光环根本不渲染。
+ * ========================================================================== */
+
+/* ---------- 一、覆盖层 ---------- */
+
+.hdd-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  overflow: hidden;
+  /* 播的时候把点击吞掉，别让用户摸到后面看不见的界面；点击 = 跳过。 */
+  pointer-events: auto;
+  cursor: default;
+  /* 不做 transition：透明度由 JS 逐帧写，带 transition 会跟时间轴打架。 */
+}
+
+/* 纯黑底：视频首帧解码出来之前挡住真实界面，否则开屏头 100ms 会闪一下 UI。
+   opacity 由 splash.js 跟着光晕一起退（退完 = 露出真实界面）。 */
+.hdd-splash__bed {
+  position: absolute;
+  inset: 0;
+  background: #000;
+}
+
+.hdd-splash__film {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: transparent;
+}
+
+.hdd-splash__glow {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  /* 大图缩放的采样别糊掉中心那团光。 */
+  transform: translateZ(0);
+}
+
+.hdd-splash__fairy {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+}
+
+/* 左下角常驻位：几何尺寸由 JS 写死，这里只管层与容器。 */
+.hdd-splash__home {
+  position: fixed;
+  z-index: 2147483600;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+}
+
+/* 常驻徽记可以拖着走：命中区只有 stage 那个圆，周围一律不吃点击。 */
+.hdd-splash__home [data-hdd-mascot-stage] {
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: none;
+  border-radius: 50%;
+}
+
+.hdd-splash__home [data-hdd-mascot-stage]:active {
+  cursor: grabbing;
+}
+
+/* 里面的柔光/切片全都别抢指针，不然拖起来会一跳一跳。 */
+.hdd-splash__home [data-hdd-mascot-stage] > * {
+  pointer-events: none;
+}
+
+/* ---------- 二、徽记 ---------- */
+
+.hdd-mascot-host [data-hdd-mascot] {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.hdd-mascot-host [data-hdd-mascot-stage] {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  max-width: 100%;
+}
+
+.hdd-mascot-host [data-hdd-mascot-bloom] {
+  position: absolute;
+  inset: -14%;
+  border-radius: 50%;
+  corner-shape: round;
+  background: radial-gradient(
+    circle closest-side,
+    rgba(150, 200, 255, 0.34) 0%,
+    rgba(80, 150, 255, 0.22) 32%,
+    rgba(56, 116, 255, 0.09) 55%,
+    rgba(0, 0, 0, 0) 74%
+  );
+  animation: hdd-mascot-bloom 3s ease-in-out infinite;
+}
+
+.hdd-mascot-host [data-hdd-mascot-stage]::before {
+  content: "";
+  position: absolute;
+  inset: -14%;
+  /* corner-shape 只改"圆角形状"，没有 border-radius 就还是个方框 —— 原皮肤漏的正是这行。 */
+  border-radius: 50%;
+  corner-shape: round;
+  border: 5px solid rgba(236, 246, 255, 0.7);
+  box-shadow:
+    0 0 16px rgba(198, 230, 255, 0.55),
+    inset 0 0 14px rgba(198, 230, 255, 0.4);
+  filter: blur(3px);
+  opacity: 0;
+  animation: hdd-mascot-ripple 3.4s ease-out infinite;
+}
+
+.hdd-mascot-host [data-hdd-mascot-mark] {
+  position: absolute;
+  inset: 11%;
+}
+
+.hdd-mascot-host [data-hdd-mascot-band] {
+  position: absolute;
+  inset: 0;
+  animation: hdd-mascot-slice 3.6s steps(1, end) infinite;
+  will-change: transform;
+}
+
+.hdd-mascot-host [data-hdd-mascot-band] svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+@keyframes hdd-mascot-bloom {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes hdd-mascot-ripple {
+  0% {
+    transform: scale(1.08);
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.9;
+  }
+  66% {
+    opacity: 0.3;
+  }
+  100% {
+    transform: scale(1.42);
+    opacity: 0;
+  }
+}
+
+@keyframes hdd-mascot-slice {
+  0%,
+  96% {
+    transform: translateX(0);
+    filter: none;
+  }
+  96.2% {
+    transform: translateX(var(--hdd-shift, 0px));
+    filter: brightness(1.35) saturate(1.35);
+  }
+  97.4% {
+    transform: translateX(calc(var(--hdd-shift, 0px) * -0.35));
+    filter: brightness(1.12);
+  }
+  98.4%,
+  100% {
+    transform: translateX(0);
+    filter: none;
+  }
+}
+
+.hdd-mascot-host [data-hdd-mark-scope] #hddFairyCorners {
+  transform-box: view-box;
+  transform-origin: 80px 80px;
+  animation: hdd-mascot-turn 3s linear infinite;
+}
+
+.hdd-mascot-host [data-hdd-mark-scope] #hddFairySclera {
+  animation-name: hdd-mascot-sclera;
+}
+
+.hdd-mascot-host [data-hdd-mark-scope] #hddFairyIrisOuter {
+  animation-name: hdd-mascot-iris-outer;
+  animation-delay: -47ms;
+}
+
+.hdd-mascot-host [data-hdd-mark-scope] #hddFairyIrisBlue {
+  animation-name: hdd-mascot-iris-blue;
+  animation-delay: -94ms;
+}
+
+.hdd-mascot-host [data-hdd-mark-scope] #hddFairyHighlight {
+  animation-name: hdd-mascot-iris-blue;
+  animation-delay: -94ms;
+}
+
+.hdd-mascot-host [data-hdd-mark-scope] #hddFairyPupil {
+  animation-name: hdd-mascot-pupil;
+  animation-delay: -188ms;
+}
+
+@keyframes hdd-mascot-turn {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes hdd-mascot-sclera {
+  0%,
+  100% {
+    transform: scale(0.985);
+  }
+  50% {
+    transform: scale(0.91);
+  }
+}
+
+@keyframes hdd-mascot-iris-outer {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes hdd-mascot-iris-blue {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.87);
+  }
+}
+
+@keyframes hdd-mascot-pupil {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.85);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hdd-mascot-host [data-hdd-mascot-bloom],
+  .hdd-mascot-host [data-hdd-mascot-stage]::before,
+  .hdd-mascot-host [data-hdd-mascot-band],
+  .hdd-mascot-host [data-hdd-mark-scope] #hddFairyCorners,
+  .hdd-mascot-host [data-hdd-mark-scope] #hddFairySclera,
+  .hdd-mascot-host [data-hdd-mark-scope] #hddFairyIrisOuter,
+  .hdd-mascot-host [data-hdd-mark-scope] #hddFairyIrisBlue,
+  .hdd-mascot-host [data-hdd-mark-scope] #hddFairyPupil,
+  .hdd-mascot-host [data-hdd-mark-scope] #hddFairyHighlight {
+    animation: none;
+  }
+}

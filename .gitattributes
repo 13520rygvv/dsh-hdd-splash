@@ -1,0 +1,5 @@
+# 保持 .ps1 原样（UTF-8 BOM 必须留住：Windows PowerShell 5.1 没有 BOM 会按 ANSI 解，中文注释会把下一行吞掉）
+*.ps1 -text
+*.cmd -text
+*.mp4 binary
+*.webp binary

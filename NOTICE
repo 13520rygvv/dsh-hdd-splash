@@ -1,0 +1,40 @@
+dsh-hdd-splash — 来源与素材授权说明
+=====================================
+
+这个仓库是一个二次改造的个人自用版本，不是原创作品。
+
+一、代码
+--------
+index.js / client.js / lib/*.js / lib/splash.css / lib/maximize.ps1 / 安装脚本等
+由本仓库作者（GitHub @13520rygvv，B 站无关）编写，按 MIT 授权（见 LICENSE）。
+
+二、素材（不在 MIT 授权范围内）
+------------------------------
+lib/assets/boot.mp4    HDD 伪开机动画影片（本仓库只做了裁黑边 + 转码）
+lib/assets/glow.webp   蓝色光晕底图
+lib/assets/fairy.svg   FAIRY 徽记矢量图
+
+这些素材原始出处：
+
+1) B 站 UP 主「_天才小宇」
+   主页     https://space.bilibili.com/3494360513514129
+   教程视频 《把DSH改造成fairy的教程来了》
+            https://www.bilibili.com/video/BV1n7np6QEPe/
+   本项目的直接来源：素材、时序与徽记效果均参考此视频及其说明中的素材分享。
+
+2) 该视频说明中标注的上游来源
+   开屏动画原作 《我把绝区零HDD开屏动画做进了Windows开机！》
+               https://www.bilibili.com/video/BV1f7tC6oEm7/
+   灵感来源     《可能是全网最还原的Fairy（动画）》
+               https://www.bilibili.com/video/BV1SD4C63EZz/
+
+3) 形象与影片的原作
+   《绝区零》(Zenless Zone Zero) / 米哈游 — HDD 开机动画与 FAIRY 形象版权归米哈游及上述原作者。
+
+三、使用范围
+------------
+本仓库仅供作者本人及其朋友个人安装使用、学习交流，不做商业用途，
+也不构成对上述素材的任何授权。
+
+如果原作者或米哈游认为本仓库的分发不合适，请联系仓库作者或开 issue，
+作者会立即将仓库转为私有或删除。
